@@ -2,23 +2,14 @@
     "version": 2,
     "builds": [
         {
-<<<<<<< Updated upstream
             "src": "index.js",
-=======
-            "src": "server/index.js",
->>>>>>> Stashed changes
             "use": "@vercel/node"
         }
     ],
     "rewrites": [
         {
-<<<<<<< Updated upstream
             "source": "/(.*)",
             "destination": "index.js"
-=======
-            "src": "/(.*)",
-            "dest": "server/index.js"
->>>>>>> Stashed changes
         }
     ],
     "headers": [
@@ -32,8 +23,4 @@
             ]
         }
     ]
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
