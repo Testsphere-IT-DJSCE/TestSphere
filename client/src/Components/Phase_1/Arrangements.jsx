@@ -383,9 +383,9 @@ console.log("Subject:", subject);
         const boxHeight = 15
         doc.rect(blockNoX - 8, blockNoY - 8, boxWidth, boxHeight)
         doc.setFontSize(10)
-        doc.text("NOTE: (a) Please arrange answer papers serially according to Roll number.", margin, 60)
+        doc.text("NOTE: (a) Please arrange answer papers serially according to Roll No.", margin, 60)
         doc.text(
-          "(b) Please take the signature of the student on the attendance sheet serially according to SAP No.",
+          "(b) Please take the signature of the student on the attendance sheet serially according to Roll No.",
           margin + 12,
           65,
         )
