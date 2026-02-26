@@ -8,14 +8,14 @@ const VerificationModel = require('../Models/verification.model');
 router.post('/register', [
     body('name').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),
     body('email').isEmail().withMessage('Invalid Email'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+    body('password').isLength({ min: 3 }).withMessage('Password must be at least 6 characters long')
 ],
     hodController.registerHod
 )
 
 router.post('/login',[
     body('email').isEmail().withMessage('Invalid Email'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+    body('password').isLength({ min: 3 }).withMessage('Password must be at least 6 characters long')
 ],
     hodController.loginHod
 )
@@ -65,7 +65,7 @@ router.post('/verify-otp', [
 
 router.post('/reset-password', [
     body('resetToken').notEmpty().withMessage('Reset token is required'),
-    body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+    body('newPassword').isLength({ min: 3 }).withMessage('Password must be at least 6 characters long')
 ], hodController.resetPassword);
 
 module.exports = router;
