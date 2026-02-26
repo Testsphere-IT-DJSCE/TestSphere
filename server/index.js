@@ -23,7 +23,7 @@ const startServer = async () => {
         app.use(express.json());
         app.use(express.urlencoded({ extended: true })); // For parsing form data
         app.use(cors({
-            origin: ['https://fsdfrontend-tau.vercel.app', 'http://localhost:5173'], // Added localhost for testing
+            origin: ['https://fsdfrontend-tau.vercel.app', 'http://localhost:5173','https://test-sphere-frontend.vercel.app'], // Added localhost for testing
             credentials: true,               // Allow credentials
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
             allowedHeaders: ['Content-Type', 'Authorization']
