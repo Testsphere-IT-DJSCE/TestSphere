@@ -358,8 +358,7 @@ console.log("Subject:", subject);
         doc.setFontSize(12)
         doc.setTextColor(255, 0, 0)
         doc.text(
-          // `${year} B.Tech SEM ${sem}: ${exam_info} (${academicYear || "2025-26"}): SUPERVISOR'S REPORT`,
-          `Final Year B.Tech SEM ${sem}: ${exam_info} (${academicYear || "2025-26"}): SUPERVISOR'S REPORT`,
+          `${year} B.Tech Sem ${sem}: ${exam_info} (${academicYear || "2025-2026"}): SUPERVISOR'S REPORT`,
           margin + contentWidth / 2,
           32,
           { align: "center" },
