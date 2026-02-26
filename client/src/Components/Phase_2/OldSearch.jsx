@@ -73,7 +73,7 @@ export default function StudentSearch() {
 
   const fetchStudentData = async (sapId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/students/${sapId}/?year=${selectedYear}`);
+      const response = await axios.get(`https://testsphereitdjsce.vercel.app/students/${sapId}/?year=${selectedYear}`);
       const data = response.data;
       if (data && data.student) {
         return {
@@ -157,7 +157,7 @@ export default function StudentSearch() {
   
     try {
       const response = await axios.post(
-        `http://localhost:5000/students/retest?year=${selectedYear}`,
+        `https://testsphereitdjsce.vercel.app/students/retest?year=${selectedYear}`,
         { students: dataToSubmit } 
       );
       console.log(response.data);

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as XLSX from 'xlsx';
 
-const API_URL = 'http://localhost:5000/upload'; // Your backend endpoint
+const API_URL = 'https://testsphereitdjsce.vercel.app/upload'; // Your backend endpoint
 
 function StudentUpload() {
     const [formData, setFormData] = useState({
@@ -39,7 +39,7 @@ function StudentUpload() {
     const fetchSubjects = async () => {
         if (!formData.year || !formData.semester) return;
         try {
-            let url = `http://localhost:5000/api/subjects?year=${formData.year}&semester=${formData.semester}`;
+            let url = `https://testsphereitdjsce.vercel.app/api/subjects?year=${formData.year}&semester=${formData.semester}`;
             if (["DLE", "ILE", "OE"].includes(formData.type)) {
                 url += `&coursetype=${formData.type}`;
             }

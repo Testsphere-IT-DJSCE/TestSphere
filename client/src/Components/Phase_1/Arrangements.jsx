@@ -115,7 +115,7 @@ export default function Table() {
       }
       // Send year and semester as separate params
       const response = await axios.get(
-        `http://localhost:5000/api/subjects?year=${selectedYear}&semester=${selectedSemester}&coursetype=${coursetype}`
+        `https://testsphereitdjsce.vercel.app/api/subjects?year=${selectedYear}&semester=${selectedSemester}&coursetype=${coursetype}`
       );
       console.log("API Response:", response.data);
       const subjectsData = response.data.data;
@@ -135,7 +135,7 @@ export default function Table() {
   const handleRetestSelectSubject = async (termTest) => {
     if (!selectedYear || !selectedSemester || !termTest) return
     const res = await axios.get(
-      `http://localhost:5000/api/subjectsRetest?year=${selectedYear}&semester=${selectedSemester}&termTest=${termTest}`
+      `https://testsphereitdjsce.vercel.app/api/subjectsRetest?year=${selectedYear}&semester=${selectedSemester}&termTest=${termTest}`
     )
     const arr = res.data.data?.map((s) => s.Subject) || []
     setRetestSubjects(arr)
@@ -223,7 +223,7 @@ export default function Table() {
         try {
           // Send selectedElectiveSubjects as JSON string in query
           const res = await axios.get(
-            `http://localhost:5000/api/attendance?year=${year}&sem=${sem}&courseType=${courseType}&selectedSubjects=${encodeURIComponent(JSON.stringify(selectedElectiveSubjects))}`
+            `https://testsphereitdjsce.vercel.app/api/attendance?year=${year}&sem=${sem}&courseType=${courseType}&selectedSubjects=${encodeURIComponent(JSON.stringify(selectedElectiveSubjects))}`
           )
           console.log("Attendance Data:", res.data)
           response = res
@@ -232,7 +232,7 @@ export default function Table() {
         }
       } else if (courseType === "Minors") {
         try {
-          const res = await axios.get(`http://localhost:5000/api/attendance/minors?year=${year}`)
+          const res = await axios.get(`https://testsphereitdjsce.vercel.app/api/attendance/minors?year=${year}`)
           console.log("Attendance Data:", res.data)
           response = res
         } catch (error) {
@@ -241,7 +241,7 @@ export default function Table() {
       } else if (courseType === "Honors") {
         try {
           // const res = await axios.get(`https://fsd-backend-beta.vercel.app/api/attendance/honors?year=${year}`)
-          const res = await axios.get(`http://localhost:5000/api/attendance/honors?year=${year}`) 
+          const res = await axios.get(`https://testsphereitdjsce.vercel.app/api/attendance/honors?year=${year}`) 
           console.log("Attendance Data Honors:", res.data)
           response = res
         } catch (error) {
@@ -250,7 +250,7 @@ export default function Table() {
       } else {
         try {
           // Regular course type
-          const res = await axios.get(`http://localhost:5000/api/attendance?year=${year}&sem=${sem}&courseType=Regular`)
+          const res = await axios.get(`https://testsphereitdjsce.vercel.app/api/attendance?year=${year}&sem=${sem}&courseType=Regular`)
           console.log("Attendance Data:", res.data)
           response = res
         } catch (error) {
@@ -270,7 +270,7 @@ export default function Table() {
         throw new Error("Year, subject and term test are required for retest.")
       }
       const res = await axios.get(
-        `http://localhost:5000/students/retest/${encodeURIComponent(selectedSubject)}/${selectedTermTest}?year=${selectedYear}`
+        `https://testsphereitdjsce.vercel.app/students/retest/${encodeURIComponent(selectedSubject)}/${selectedTermTest}?year=${selectedYear}`
       )
       console.log("Retest Students Data:", res.data)
       return res.data.students

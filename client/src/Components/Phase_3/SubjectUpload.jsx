@@ -35,7 +35,7 @@ function SubjectUpload() {
             };
             // Sr. No. will be added in backend (or you can fetch and increment)
             // Send to backend (replace with your endpoint)
-            const res = await axios.post('http://localhost:5000/api/subjects/upload', {
+            const res = await axios.post('https://testsphereitdjsce.vercel.app/api/subjects/upload', {
                 year: form.year,
                 semester: form.semester,
                 subjectDoc: doc

@@ -80,7 +80,7 @@ function TimeTable() {
       if (!yearText || !selectedSemester) return;
       let coursetype = ""; // Set this if you want to filter by course type
       const response = await axios.get(
-        `http://localhost:5000/api/subjects?year=${yearText}&semester=${selectedSemester}&coursetype=${coursetype}`
+        `https://testsphereitdjsce.vercel.app/api/subjects?year=${yearText}&semester=${selectedSemester}&coursetype=${coursetype}`
       );
       console.log("API Response:", response.data);
       const subjectsData = response.data.data;
@@ -106,7 +106,7 @@ function TimeTable() {
       setIsLoading(true);
       const scheduleType = termText === 'Practical/Oral' ? 'Practical' : 'Theory';
       
-      const response = await axios.get('http://localhost:5000/api/timetable', {
+      const response = await axios.get('https://testsphereitdjsce.vercel.app/api/timetable', {
         params: {
           year: yearText,
           term: termText,
@@ -225,7 +225,7 @@ function TimeTable() {
         data: dataToSave
       };
   
-      await axios.post('http://localhost:5000/api/timetable', saveData);
+      await axios.post('https://testsphereitdjsce.vercel.app/api/timetable', saveData);
       alert('Timetable saved successfully');
   
       // Reload the data to ensure we have the latest version

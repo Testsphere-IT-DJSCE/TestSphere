@@ -90,7 +90,7 @@ function FlushDatabase() {
         setStatus(null);
         setLoading(true);
         try {
-            const res = await axios.delete('http://localhost:5000/delete/all');
+            const res = await axios.delete('https://testsphereitdjsce.vercel.app/delete/all');
             setStatus({ type: 'success', message: res.data.message });
         } catch (err) {
             setStatus({
@@ -166,7 +166,7 @@ function DeleteStudentData() {
         try {
             const params = { year, examType };
             if (examType === 'normal') params.courseType = courseType;
-            const res = await axios.delete('http://localhost:5000/delete/students', { params });
+            const res = await axios.delete('https://testsphereitdjsce.vercel.app/delete/students', { params });
             setStatus({ type: 'success', message: res.data.message });
             setYear(''); setExamType(''); setCourseType('');
         } catch (err) {
@@ -281,7 +281,7 @@ function DeleteSubjectData() {
         setConfirm(false);
         setStatus(null);
         try {
-            const res = await axios.delete('http://localhost:5000/delete/subjects', { params: { year, semester } });
+            const res = await axios.delete('https://testsphereitdjsce.vercel.app/delete/subjects', { params: { year, semester } });
             setStatus({ type: 'success', message: res.data.message });
             setYear(''); setSemester('');
         } catch (err) {

@@ -59,7 +59,7 @@ export default function StudentSearch() {
   useEffect(() => {
     const fetchVerifiedYears = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/hod/verified-years');
+        const response = await axios.get('https://testsphereitdjsce.vercel.app/hod/verified-years');
         setVerifiedYears(response.data.verifiedYears);
       } catch (error) {
         console.error('Error fetching verified years:', error);
@@ -87,7 +87,7 @@ export default function StudentSearch() {
   const handleSelectSubject = async (e) => {
     try {
       const semester = selectedSemester;
-      const response = await axios.get(`http://localhost:5000/api/subjectsRetest?semester=${semester}&year=${selectedYear}`);
+      const response = await axios.get(`https://testsphereitdjsce.vercel.app/api/subjectsRetest?semester=${semester}&year=${selectedYear}`);
       const subjectsData = response.data.data;
       if (Array.isArray(subjectsData)) {
         const subjectsArray = subjectsData.map((subject) => subject.Subject);
@@ -102,7 +102,7 @@ export default function StudentSearch() {
 
   const fetchStudentDataBasedOnSubject = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/students/retest/${selectedSubject}?year=${selectedYear}`);
+      const response = await axios.get(`https://testsphereitdjsce.vercel.app/students/retest/${selectedSubject}?year=${selectedYear}`);
       const data = response.data;
       if (data && data.students) {
         const formattedStudents = data.students.map((student) => ({
@@ -147,7 +147,7 @@ export default function StudentSearch() {
 
   const fetchStudentData = async (sapId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/students/${sapId}/?year=${selectedYear}`);
+      const response = await axios.get(`https://testsphereitdjsce.vercel.app/students/${sapId}/?year=${selectedYear}`);
       const data = response.data;
       if (data && data.student) {
         return {
@@ -177,7 +177,7 @@ export default function StudentSearch() {
     }
 
     try {
-      const { data } = await axios.get(`http://localhost:5000/students/${searchId}/?year=${selectedYear}`);
+      const { data } = await axios.get(`https://testsphereitdjsce.vercel.app/${searchId}/?year=${selectedYear}`);
       const student = data?.student;
 
       if (student) {
@@ -220,7 +220,7 @@ export default function StudentSearch() {
 
   const handleDeleteStudentEdit = async (studentId, sapId) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/students/retest/${sapId}`, {
+      const response = await axios.delete(`https://testsphereitdjsce.vercel.app/students/retest/${sapId}`, {
         params: {
           subject: selectedSubject,
           year: selectedYear
@@ -259,7 +259,7 @@ export default function StudentSearch() {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/students/retest/register?year=${selectedYear}`,
+        `https://testsphereitdjsce.vercel.app/students/retest/register?year=${selectedYear}`,
         { students: dataToSubmit }
       );
 
@@ -298,7 +298,7 @@ export default function StudentSearch() {
     try {
       console.log('Payload:', { students: dataToSubmit });
       const response = await axios.put(
-        `http://localhost:5000/students/retest/update?year=${selectedYear}`,
+        `https://testsphereitdjsce.vercel.app/students/retest/update?year=${selectedYear}`,
         { students: dataToSubmit }
       );
 
