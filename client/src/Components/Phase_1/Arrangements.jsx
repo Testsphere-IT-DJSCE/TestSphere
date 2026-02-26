@@ -358,7 +358,7 @@ console.log("Subject:", subject);
         doc.setFontSize(12)
         doc.setTextColor(255, 0, 0)
         doc.text(
-          `${year} B.Tech Sem ${sem}: ${exam_info} (${academicYear || "2025-2026"}): SUPERVISOR'S REPORT`,
+          `${year =="BE"? "Final Year" : year } B.Tech Sem ${sem}: ${exam_info} (${academicYear || "2025-2026"}): SUPERVISOR'S REPORT`,
           margin + contentWidth / 2,
           32,
           { align: "center" },
@@ -601,7 +601,7 @@ console.log("Subject:", subject);
         doc.text(boldText, x + lastLineWidth, currentY)
         doc.setFont("Calibri", "normal")
       }
-      const noticeText = `All the ${selectedYear} B.Tech IT students are hereby instructed to strictly adhere to the following seating arrangement for their ${selectedExam} (${academicYear || "2025-26"}) for`
+      const noticeText = `All the ${selectedYear =="BE"? "Final Year" : selectedYear } B.Tech IT students are hereby instructed to strictly adhere to the following seating arrangement for their ${selectedExam} (${academicYear || "2025-26"}) for`
       //const noticeText = `All the Final Year B.Tech IT students are hereby instructed to strictly adhere to the following seating arrangement for their ${selectedExam} (${academicYear || "2025-26"}) for`
       const subjectText = selectedExam === "Retest"
         ? `Retest - ${selectedSubject} (${selectedTermTest === "TermTest1" ? "Term Test I" : "Term Test II"})`
