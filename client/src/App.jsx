@@ -9,7 +9,7 @@ import TimeTable from "./Components/Phase_1/TimeTable";
 import Login from "./Components/Login";
 import HODPage from "./Components/Phase_2/HODPage";
 import AdministratorPage from "./Components/Phase_3/AdministratorPage";
-import StudentUpload from "./Components/Phase_3/studentUpload";
+import StudentUpload from "./Components/Phase_3/StudentUpload";
 import SubjectUpload from "./Components/Phase_3/SubjectUpload";
 import DeleteData from "./Components/Phase_3/DeleteData";
 import { UserContext } from "./Context/userContext";
