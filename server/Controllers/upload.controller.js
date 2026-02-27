@@ -1,6 +1,5 @@
 const xlsx = require("xlsx");
 const createStudentModel = require("../Models/attendance.students.model");
-const mongoose = require("mongoose");
 
 const uploadExcel = async (req, res) => {
   try {
@@ -12,7 +11,6 @@ const uploadExcel = async (req, res) => {
       selectedSubjects = [],
     } = req.body;
 
-    // Validate required fields
     if (!year || !semester || !courseType || !batch) {
       return res.status(400).json({
         success: false,
@@ -27,7 +25,6 @@ const uploadExcel = async (req, res) => {
       });
     }
 
-    // Parse selectedSubjects if sent as JSON string
     let parsedSelectedSubjects = selectedSubjects;
     if (typeof selectedSubjects === "string") {
       try {
@@ -42,7 +39,7 @@ const uploadExcel = async (req, res) => {
 
     let allStudents = [];
 
-    // Process each uploaded Excel file (from memory buffer)
+    // Read Excel files from memory buffer
     for (const file of req.files) {
       const match = file.originalname.match(/(I1|I2|I3)/i);
       const division = match ? match[1].toUpperCase() : "UNKNOWN";
@@ -118,15 +115,11 @@ const uploadExcel = async (req, res) => {
     }
 
     // ==============================
-    // REGULAR TYPE (Overwrite)
+    // REGULAR + ALL OTHER TYPES
     // ==============================
-    const collections = await mongoose.connection.db
-      .listCollections({ name: collectionName })
-      .toArray();
 
-    if (collections.length > 0) {
-      await mongoose.connection.db.dropCollection(collectionName);
-    }
+    // Overwrite collection safely using mongoose
+    await StudentModel.deleteMany({});
 
     if (allStudents.length > 0) {
       await StudentModel.insertMany(allStudents);
@@ -134,8 +127,9 @@ const uploadExcel = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `Regular upload successful. Inserted ${allStudents.length} records into ${collectionName}`,
+      message: `Upload successful. Inserted ${allStudents.length} records into ${collectionName}`,
     });
+
   } catch (error) {
     console.error("Upload error:", error);
 
