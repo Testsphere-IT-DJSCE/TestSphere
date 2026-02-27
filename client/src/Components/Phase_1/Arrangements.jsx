@@ -115,7 +115,7 @@ export default function Table() {
       }
       // Send year and semester as separate params
       const response = await axios.get(
-        `https://testsphereitdjsce.vercel.app/api/subjects?year=${selectedYear}&semester=${selectedSemester}&coursetype=${coursetype}`
+        `http://localhost:5000/api/subjects?year=${selectedYear}&semester=${selectedSemester}&coursetype=${coursetype}`
       );
       console.log("API Response:", response.data);
       const subjectsData = response.data.data;
@@ -135,7 +135,7 @@ export default function Table() {
   const handleRetestSelectSubject = async (termTest) => {
     if (!selectedYear || !selectedSemester || !termTest) return
     const res = await axios.get(
-      `https://testsphereitdjsce.vercel.app/api/subjectsRetest?year=${selectedYear}&semester=${selectedSemester}&termTest=${termTest}`
+      `http://localhost:5000/api/subjectsRetest?year=${selectedYear}&semester=${selectedSemester}&termTest=${termTest}`
     )
     const arr = res.data.data?.map((s) => s.Subject) || []
     setRetestSubjects(arr)
@@ -223,7 +223,7 @@ export default function Table() {
         try {
           // Send selectedElectiveSubjects as JSON string in query
           const res = await axios.get(
-            `https://testsphereitdjsce.vercel.app/api/attendance?year=${year}&sem=${sem}&courseType=${courseType}&selectedSubjects=${encodeURIComponent(JSON.stringify(selectedElectiveSubjects))}`
+            `http://localhost:5000/api/attendance?year=${year}&sem=${sem}&courseType=${courseType}&selectedSubjects=${encodeURIComponent(JSON.stringify(selectedElectiveSubjects))}`
           )
           console.log("Attendance Data:", res.data)
           response = res
@@ -232,7 +232,7 @@ export default function Table() {
         }
       } else if (courseType === "Minors") {
         try {
-          const res = await axios.get(`https://testsphereitdjsce.vercel.app/api/attendance/minors?year=${year}`)
+          const res = await axios.get(`http://localhost:5000/api/attendance/minors?year=${year}`)
           console.log("Attendance Data:", res.data)
           response = res
         } catch (error) {
@@ -241,7 +241,7 @@ export default function Table() {
       } else if (courseType === "Honors") {
         try {
           // const res = await axios.get(`https://fsd-backend-beta.vercel.app/api/attendance/honors?year=${year}`)
-          const res = await axios.get(`https://testsphereitdjsce.vercel.app/api/attendance/honors?year=${year}`) 
+          const res = await axios.get(`http://localhost:5000/api/attendance/honors?year=${year}`) 
           console.log("Attendance Data Honors:", res.data)
           response = res
         } catch (error) {
@@ -250,7 +250,7 @@ export default function Table() {
       } else {
         try {
           // Regular course type
-          const res = await axios.get(`https://testsphereitdjsce.vercel.app/api/attendance?year=${year}&sem=${sem}&courseType=Regular`)
+          const res = await axios.get(`http://localhost:5000/api/attendance?year=${year}&sem=${sem}&courseType=Regular`)
           console.log("Attendance Data:", res.data)
           response = res
         } catch (error) {
@@ -270,7 +270,7 @@ export default function Table() {
         throw new Error("Year, subject and term test are required for retest.")
       }
       const res = await axios.get(
-        `https://testsphereitdjsce.vercel.app/students/retest/${encodeURIComponent(selectedSubject)}/${selectedTermTest}?year=${selectedYear}`
+        `http://localhost:5000/students/retest/${encodeURIComponent(selectedSubject)}/${selectedTermTest}?year=${selectedYear}`
       )
       console.log("Retest Students Data:", res.data)
       return res.data.students
@@ -330,11 +330,12 @@ export default function Table() {
       selectedExam === "Practicals/Orals"
         ? formBatches.map((batch) => batch.name)
         : classrooms.map((classroom) => classroom.room)
-        // Even cleaner version
-const subject = (selectedCourseType === "Honors" || selectedCourseType === "Minors") 
-? selectedCourseType 
-: selectedSubject;
-console.log("Subject:", subject);
+
+    const subject = (selectedCourseType === "Honors" || selectedCourseType === "Minors") 
+      ? selectedCourseType 
+      : selectedSubject;
+    console.log("Subject:", subject);
+
     const exam_info = selectedExam
     const year = selectedYear
     const sem = selectedSemester
@@ -345,27 +346,30 @@ console.log("Subject:", subject);
     const totalRows = attendanceData.length
 
     if (type === "attendance") {
-      // Even cleaner version
       const doc = new jsPDF("p", "mm", "a4")
       doc.setFont("Times New Roman", "bold")
-      // Define margins and page width
+
       const margin = 20
       const pageWidth = doc.internal.pageSize.getWidth()
       const contentWidth = pageWidth - 2 * margin
-      const addHeader = (blockNo, div, subject) => {
+
+      // ✅ CHANGE 1: Added subCode parameter, and display it in Subject field
+      const addHeader = (blockNo, div, subCode) => {
         const imgData = logo
         doc.addImage(imgData, "PNG", margin, 5, contentWidth, 20)
         doc.setFontSize(12)
         doc.setTextColor(255, 0, 0)
         doc.text(
-          `${year =="BE"? "Final Year" : year } B.Tech Sem ${sem}: ${exam_info} (${academicYear || "2025-2026"}): SUPERVISOR'S REPORT`,
+          `Final Year B.Tech SEM ${sem}: ${exam_info} (${academicYear || "2025-26"}): SUPERVISOR'S REPORT`,
           margin + contentWidth / 2,
           32,
           { align: "center" },
         )
         doc.setTextColor(0, 0, 0)
         doc.setFontSize(10)
-        doc.text(`Subject: - ________________________`, margin, 44)
+
+        // ✅ CHANGE 1: Show actual SubCode instead of blank underscores
+        doc.text(`Subject: - ${subCode || "________________________"}`, margin, 44)
         doc.text("Branch: - Information Technology", margin + contentWidth / 2 + 19, 44, { align: "center" })
         doc.text(`Div: - ${div}`, margin + 55, 50)
         doc.text("Date: - _________________", margin, 50)
@@ -376,16 +380,16 @@ console.log("Subject:", subject);
         if (/\d/.test(blockNo)) {
           doc.text(`Block No: ${blockNo}`, blockNoX, blockNoY);
         } else {
-          doc.text(`${blockNo}`, blockNoX, blockNoY);                                                                                                                  
+          doc.text(`${blockNo}`, blockNoX, blockNoY);
         }
 
         const boxWidth = 40
         const boxHeight = 15
         doc.rect(blockNoX - 8, blockNoY - 8, boxWidth, boxHeight)
         doc.setFontSize(10)
-        doc.text("NOTE: (a) Please arrange answer papers serially according to Roll No.", margin, 60)
+        doc.text("NOTE: (a) Please arrange answer papers serially according to SAP number.", margin, 60)
         doc.text(
-          "(b) Please take the signature of the student on the attendance sheet serially according to Roll No.",
+          "(b) Please take the signature of the student on the attendance sheet serially according to SAP No.",
           margin + 12,
           65,
         )
@@ -407,15 +411,14 @@ console.log("Subject:", subject);
 
       let currentIndex = 0
       let pageNumber = 0
-      let remainingCapacity = selectedExam === "Practicals/Orals" ? formBatches[0].capacity : classrooms[0].capacity // Initialize with the first classroom's capacity
-      let currentClassroomIndex = 0 // Track the current classroom
+      let remainingCapacity = selectedExam === "Practicals/Orals" ? formBatches[0].capacity : classrooms[0].capacity
+      let currentClassroomIndex = 0
 
-      // For Regular courseType, use division and globSrNo from backend data
       let currentDivision =
         selectedCourseType === "Regular"
           ? attendanceData[0]?.division
           : attendanceData[0]?.division || attendanceData[0]?.Division;
-      let currentSub = attendanceData[0]?.SubCode;
+      let currentSub = attendanceData[0]?.selectedSubject;
 
       while (currentIndex < totalRows) {
         const classroom =
@@ -425,6 +428,7 @@ console.log("Subject:", subject);
         const { room, capacity } = classroom;
 
         if (remainingCapacity === capacity) {
+          // ✅ Pass currentSub to addHeader
           addHeader(blockNos[currentClassroomIndex], currentDivision, currentSub);
         }
 
@@ -433,7 +437,6 @@ console.log("Subject:", subject);
 
         while (currentIndex < totalRows) {
           const student = attendanceData[currentIndex];
-          // For Regular, use division; for electives, fallback to division or Division
           const studentDivision =
             selectedCourseType === "Regular"
               ? student.division
@@ -442,12 +445,12 @@ console.log("Subject:", subject);
           const studentSap = student.sapId || student.Sap;
           const studentRollNo = student.rollNo || student.roll;
 
-          // Check if division changes
+          // ✅ CHANGE 3: Partition on division change always, 
+          //    AND also on SubCode change for non-Regular course types
           if (
-            (selectedCourseType === "Regular" && studentDivision !== currentDivision) ||
-            (selectedCourseType !== "Regular" && studentDivision !== currentDivision) ||
             remainingCapacity === 0 ||
-            student.SubCode !== currentSub
+            studentDivision !== currentDivision ||
+            (selectedCourseType !== "Regular" && student.selectedSubject !== currentSub)
           ) {
             doc.autoTable({
               head: [["Sr. No.", "Roll No.", "SAP No.", "Name of the student", "Signature"]],
@@ -480,7 +483,7 @@ console.log("Subject:", subject);
             doc.addPage();
             pageNumber++;
 
-            // Start a new page
+            // Advance to next classroom only if capacity was exhausted
             if (remainingCapacity === 0) {
               currentClassroomIndex =
                 (currentClassroomIndex + 1) %
@@ -491,22 +494,26 @@ console.log("Subject:", subject);
                   : classrooms[currentClassroomIndex]
               ).capacity;
             }
+
+            // ✅ Update current division and SubCode to the new student's values
             currentDivision =
               selectedCourseType === "Regular"
                 ? student.division
                 : student.division || student.Division;
-            currentSub = student.SubCode;
+            currentSub = student.selectedSubject;
+
+            // ✅ Pass updated currentSub to addHeader for the new page
             addHeader(blockNos[currentClassroomIndex], currentDivision, currentSub);
             pageRows.length = 0;
             pageSrNo = 1;
           }
-          // Add student to the current page
+
           pageRows.push([pageSrNo++, studentRollNo, studentSap, studentName]);
           currentIndex++;
           remainingCapacity--;
         }
 
-        // Add the last processed page
+        // Add the last page
         if (pageRows.length > 0) {
           doc.autoTable({
             head: [["Sr. No.", "Roll No.", "SAP No.", "Name of the student", "Signature"]],
@@ -526,20 +533,22 @@ console.log("Subject:", subject);
               fontSize: 10,
             },
             columnStyles: {
-                0: { halign: "center", cellWidth: 15 },
-                1: { halign: "center", cellWidth: 12 },
-                2: { halign: "center", cellWidth: 45 },
-                3: { halign: "left", cellWidth: 80 },
-                4: { halign: "center", cellWidth: 30 },
-              },
+              0: { halign: "center", cellWidth: 15 },
+              1: { halign: "center", cellWidth: 12 },
+              2: { halign: "center", cellWidth: 45 },
+              3: { halign: "left", cellWidth: 80 },
+              4: { halign: "center", cellWidth: 30 },
+            },
             margin: { top: 10, right: margin, left: margin },
           });
 
           addFooter();
         }
       }
+
       doc.save(`Attendance_${year}_${subject}.pdf`)
-    } else if (type === "allocation") {
+    }
+      else if (type === "allocation") {
       const doc = new jsPDF("p", "mm", "a4")
       const margin = 15
       const availableWidth = doc.internal.pageSize.getWidth() - 2 * margin
@@ -601,7 +610,7 @@ console.log("Subject:", subject);
         doc.text(boldText, x + lastLineWidth, currentY)
         doc.setFont("Calibri", "normal")
       }
-      const noticeText = `All the ${selectedYear =="BE"? "Final Year" : selectedYear } B.Tech IT students are hereby instructed to strictly adhere to the following seating arrangement for their ${selectedExam} (${academicYear || "2025-26"}) for`
+      const noticeText = `All the ${selectedYear} B.Tech IT students are hereby instructed to strictly adhere to the following seating arrangement for their ${selectedExam} (${academicYear || "2025-26"}) for`
       //const noticeText = `All the Final Year B.Tech IT students are hereby instructed to strictly adhere to the following seating arrangement for their ${selectedExam} (${academicYear || "2025-26"}) for`
       const subjectText = selectedExam === "Retest"
         ? `Retest - ${selectedSubject} (${selectedTermTest === "TermTest1" ? "Term Test I" : "Term Test II"})`
@@ -631,7 +640,7 @@ console.log("Subject:", subject);
               student.division || student.Division || "";
             const rollNo =
               student.rollNo || student.roll || student.RollNo || "";
-            const SubCode = student.selectedSubject || "";
+            const SubCode = student.SubCode || "";
             const dept_minor = student.Department || "";
             if (selectedExam === "Retest") {
               classroomData.push(
@@ -641,8 +650,8 @@ console.log("Subject:", subject);
               );
             } else if (selectedCourseType === "ILE" || selectedCourseType === "DLE" || selectedCourseType === "OE") {
               classroomData.push(
-                (SubCode ? SubCode : "") +
-                (SubCode && rollNo ? "-" : "") +
+                (division ? division : "") +
+                (division && rollNo ? "-" : "") +
                 (rollNo ? rollNo : "")
               );
             } else if (selectedCourseType === "Regular") {
