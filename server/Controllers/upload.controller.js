@@ -27,14 +27,6 @@ const uploadExcel = async (req, res) => {
       });
     }
 
-    // Ensure MongoDB connection exists
-    if (!mongoose.connection.db) {
-      return res.status(500).json({
-        success: false,
-        message: "Database not connected.",
-      });
-    }
-
     // Parse selectedSubjects if sent as JSON string
     let parsedSelectedSubjects = selectedSubjects;
     if (typeof selectedSubjects === "string") {
