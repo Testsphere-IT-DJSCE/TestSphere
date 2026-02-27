@@ -631,7 +631,7 @@ console.log("Subject:", subject);
               student.division || student.Division || "";
             const rollNo =
               student.rollNo || student.roll || student.RollNo || "";
-            const SubCode = student.SubCode || "";
+            const SubCode = student.selectedSubject || "";
             const dept_minor = student.Department || "";
             if (selectedExam === "Retest") {
               classroomData.push(
@@ -641,8 +641,8 @@ console.log("Subject:", subject);
               );
             } else if (selectedCourseType === "ILE" || selectedCourseType === "DLE" || selectedCourseType === "OE") {
               classroomData.push(
-                (division ? division : "") +
-                (division && rollNo ? "-" : "") +
+                (SubCode ? SubCode : "") +
+                (SubCode && rollNo ? "-" : "") +
                 (rollNo ? rollNo : "")
               );
             } else if (selectedCourseType === "Regular") {
