@@ -157,7 +157,6 @@ setSubjects(subjectsArray);
 
         try {
             const res = await axios.post(API_URL, data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
                 withCredentials: true
             });
 

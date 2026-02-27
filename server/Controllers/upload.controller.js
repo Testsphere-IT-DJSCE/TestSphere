@@ -1,58 +1,67 @@
-// modified version of file upload
 const xlsx = require("xlsx");
 const createStudentModel = require("../Models/attendance.students.model");
 const mongoose = require("mongoose");
-const fs = require("fs"); // Add fs for file deletion
 
 const uploadExcel = async (req, res) => {
-  let divisionFileMap = [];
   try {
     const {
       year,
       semester,
       type: courseType,
       batch,
-      selectedSubjects = []
+      selectedSubjects = [],
     } = req.body;
 
-    // Parse selectedSubjects if it's a string (from JSON.stringify on frontend)
+    // Validate required fields
+    if (!year || !semester || !courseType || !batch) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields.",
+      });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No Excel files uploaded.",
+      });
+    }
+
+    // Ensure MongoDB connection exists
+    if (!mongoose.connection.db) {
+      return res.status(500).json({
+        success: false,
+        message: "Database not connected.",
+      });
+    }
+
+    // Parse selectedSubjects if sent as JSON string
     let parsedSelectedSubjects = selectedSubjects;
     if (typeof selectedSubjects === "string") {
       try {
         parsedSelectedSubjects = JSON.parse(selectedSubjects);
-      } catch (e) {
+      } catch {
         parsedSelectedSubjects = [];
       }
     }
 
-    // Validate required fields
-    if (!year || !semester || !courseType || !batch || !req.files || req.files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required fields or no files uploaded."
-      });
-    }
-
     const collectionName = `${year}_${courseType}_Data`;
     const StudentModel = createStudentModel(collectionName);
+
     let allStudents = [];
 
-    // Auto map files to divisions by filename
-    divisionFileMap = req.files.map(file => {
-      const match = file.originalname.match(/(I1|I2|I3)/);
-      const division = match ? match[1] : "UNKNOWN";
-      return { division, filePath: file.path };
-    });
+    // Process each uploaded Excel file (from memory buffer)
+    for (const file of req.files) {
+      const match = file.originalname.match(/(I1|I2|I3)/i);
+      const division = match ? match[1].toUpperCase() : "UNKNOWN";
 
-    // Read all Excel files and accumulate students
-    for (const { division, filePath } of divisionFileMap) {
-      const workbook = xlsx.readFile(filePath);
+      const workbook = xlsx.read(file.buffer, { type: "buffer" });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
 
       for (let i = 1; i < data.length; i++) {
         if (data[i][0] && data[i][1] && data[i][2] && data[i][3]) {
-          const student = {
+          allStudents.push({
             srNo: data[i][0],
             rollNo: data[i][1],
             sapId: data[i][2],
@@ -61,9 +70,11 @@ const uploadExcel = async (req, res) => {
             semester: Number(semester),
             courseType,
             batch,
-            selectedSubjects: courseType === "Regular" ? [] : [...parsedSelectedSubjects],
-          };
-          allStudents.push(student);
+            selectedSubjects:
+              courseType === "Regular"
+                ? []
+                : [...parsedSelectedSubjects],
+          });
         }
       }
     }
@@ -74,23 +85,31 @@ const uploadExcel = async (req, res) => {
       globSrNo: index + 1,
     }));
 
+    // ==============================
+    // ELECTIVE TYPES (ILE, DLE, OE)
+    // ==============================
     if (["ILE", "DLE", "OE"].includes(courseType)) {
-      // Update or insert for elective types
       let updatedCount = 0;
       let newCount = 0;
 
       for (const student of allStudents) {
-        const existing = await StudentModel.findOne({ sapId: student.sapId });
+        const existing = await StudentModel.findOne({
+          sapId: student.sapId,
+        });
 
         if (existing) {
           const newSubjects = student.selectedSubjects.filter(
-            subj => !existing.selectedSubjects.includes(subj)
+            (subj) => !existing.selectedSubjects.includes(subj)
           );
 
           if (newSubjects.length > 0) {
             await StudentModel.updateOne(
               { sapId: student.sapId },
-              { $addToSet: { selectedSubjects: { $each: newSubjects } } }
+              {
+                $addToSet: {
+                  selectedSubjects: { $each: newSubjects },
+                },
+              }
             );
             updatedCount++;
           }
@@ -100,49 +119,39 @@ const uploadExcel = async (req, res) => {
         }
       }
 
-      // Clean up uploaded files
-      divisionFileMap.forEach(({ filePath }) => {
-        try { fs.unlinkSync(filePath); } catch (e) { /* ignore */ }
-      });
-
       return res.status(200).json({
         success: true,
         message: `Elective upload successful for ${collectionName}. Updated: ${updatedCount}, New: ${newCount}`,
       });
-    } else {
-      // Overwrite for Regular type
-      const collections = await mongoose.connection.db.listCollections({ name: collectionName }).toArray();
-      if (collections.length > 0) {
-        await mongoose.connection.db.dropCollection(collectionName);
-      }
-
-      await StudentModel.insertMany(allStudents);
-
-      // Clean up uploaded files
-      divisionFileMap.forEach(({ filePath }) => {
-        try { fs.unlinkSync(filePath); } catch (e) { /* ignore */ }
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: `Regular upload successful. Inserted ${allStudents.length} records into ${collectionName}`,
-      });
     }
 
+    // ==============================
+    // REGULAR TYPE (Overwrite)
+    // ==============================
+    const collections = await mongoose.connection.db
+      .listCollections({ name: collectionName })
+      .toArray();
+
+    if (collections.length > 0) {
+      await mongoose.connection.db.dropCollection(collectionName);
+    }
+
+    if (allStudents.length > 0) {
+      await StudentModel.insertMany(allStudents);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Regular upload successful. Inserted ${allStudents.length} records into ${collectionName}`,
+    });
   } catch (error) {
     console.error("Upload error:", error);
+
     return res.status(500).json({
       success: false,
-      message: "Upload failed",
+      message: "Upload failed.",
       error: error.message,
     });
-  } finally {
-    // Ensure files are deleted even if error occurs
-    if (divisionFileMap && divisionFileMap.length > 0) {
-      divisionFileMap.forEach(({ filePath }) => {
-        try { fs.unlinkSync(filePath); } catch (e) { /* ignore */ }
-      });
-    }
   }
 };
 
