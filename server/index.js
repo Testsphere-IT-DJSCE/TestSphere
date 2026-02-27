@@ -116,6 +116,12 @@ app.use('/delete', deleteRoutes);
 app.get('/', (req, res) => {
   res.send('API is running');
 });
+app.get('/debug', (req, res) => {
+  res.json({ 
+    mongoUri: process.env.MONGO_URI ? "loaded" : "missing",
+    port: process.env.PORT 
+  });
+});
 
 // IMPORTANT: Export app (DO NOT use app.listen)
 module.exports = app;
