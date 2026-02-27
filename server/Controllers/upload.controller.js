@@ -1,8 +1,10 @@
 const xlsx = require("xlsx");
 const createStudentModel = require("../Models/attendance.students.model");
+const connectDb = require("../db/connection"); // add this
 
 const uploadExcel = async (req, res) => {
   try {
+    await connectDb(); // Ensure DB connection is established
     const {
       year,
       semester,
